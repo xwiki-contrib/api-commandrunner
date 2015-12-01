@@ -21,6 +21,7 @@ package org.xwiki.contrib;
 
 import java.io.OutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -117,6 +118,54 @@ public class CommandRunnerScriptService implements ScriptService
         }
         return out;
     }
+  
+    private static CmdReturn runCmd(final String[] cmd, final String stdin, long timeoutMillis)
+        throws Exception
+    {
+        //System.out.println("debug: " + cmd + " < " + stdin);
+
+        final CmdReturn out = new CmdReturn();
+        final AtomicInteger ai = new AtomicInteger(0);
+        final Process[] process = new Process[1];
+
+        startThread(ai, new Func() { void call() throws Exception {
+            process[0] = Runtime.getRuntime().exec(cmd);
+            startThread(ai, new Func() { void call() throws Exception {
+                out.stdout = IOUtils.toString(process[0].getInputStream(), "UTF-8");
+            }});
+            startThread(ai, new Func() { void call() throws Exception {
+                out.stderr = IOUtils.toString(process[0].getErrorStream(), "UTF-8");
+            }});
+            startThread(ai, new Func() { void call() throws Exception {
+                OutputStream stdinStream = process[0].getOutputStream();
+                IOUtils.write(stdin, stdinStream, "UTF-8");
+                stdinStream.close();
+            }});
+
+            process[0].waitFor();
+            if (out.retCode != CmdReturn.retCode_TIMEOUT) {
+                out.retCode = process[0].exitValue();
+            }
+        }});
+
+
+        int waitMilliseconds = 0;
+        while (ai.get() != 0) {
+            Thread.sleep(10);
+            waitMilliseconds += 10;
+            if (waitMilliseconds > timeoutMillis) {
+                if (process[0] != null) {
+                    process[0].destroy();
+                }
+                //System.out.println("warning: TIMEOUT " + cmd + " < " + stdin);
+                out.retCode = CmdReturn.retCode_TIMEOUT;
+            }
+            if (waitMilliseconds > (2 * timeoutMillis)) {
+                throw new RuntimeException("hung thread");
+            }
+        }
+        return out;
+    }
 
     public Map<String, String> run(String command, String stdin, long timeoutMillis)
         throws Exception
@@ -128,6 +177,29 @@ public class CommandRunnerScriptService implements ScriptService
         }
 
         CmdReturn out = runCmd(command, stdin, timeoutMillis);
+        outMap.put("stdout", out.stdout);
+        outMap.put("stderr", out.stderr);
+        if (out.retCode == CmdReturn.retCode_TIMEOUT) {
+            outMap.put("error", "TIMEOUT");
+            out.retCode = -1;
+        } else {
+            outMap.put("error", "none");
+        }
+        outMap.put("ret", ""+out.retCode);
+        return outMap;
+    }
+  
+    public Map<String, String> run(ArrayList<String> command, String stdin, long timeoutMillis)
+        throws Exception
+    {
+        Map<String, String> outMap = new HashMap<String, String>();
+        if (!this.bridge.hasProgrammingRights()) {
+            outMap.put("error", "ENOPERM");
+            return outMap;
+        }
+        String[] cmdArray = new String[command.size()];
+        cmdArray = command.toArray(cmdArray);
+        CmdReturn out = runCmd(cmdArray, stdin, timeoutMillis);
         outMap.put("stdout", out.stdout);
         outMap.put("stderr", out.stderr);
         if (out.retCode == CmdReturn.retCode_TIMEOUT) {
