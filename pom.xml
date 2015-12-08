@@ -42,6 +42,17 @@
     <tag>HEAD</tag>
   </scm>
 
+  <developers>
+    <developer>
+      <id>cjdelisle</id>
+      <name>Caleb James DeLisle</name>
+    </developer>
+    <developer>
+      <id>mouhb</id>
+      <name>Mohamed Boussaa</name>
+    </developer>
+  </developers>
+
   <properties>
    <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
