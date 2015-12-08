@@ -29,13 +29,19 @@
     <artifactId>xwiki-commons-pom</artifactId>
     <version>5.2</version>
   </parent>
-  <version>1.0</version>
+  <version>1.2-SNAPSHOT</version>
   <groupId>org.xwiki.contrib</groupId>
-  <artifactId>xwiki-contrib-commandrunner</artifactId>
-  <name>External Command Runner</name>
+  <artifactId>api-commandrunner</artifactId>
+  <name>Command Runner API</name>
   <description>Run a native/shell command in XWiki and get the result.</description>
 
   <properties>
+   <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- The extension's category -->
+    <xwiki.extension.category>api</xwiki.extension.category>
+     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>calebjamesdelisle:commandrunner</xwiki.extension.features>
     <xwiki.version>5.2</xwiki.version>
   </properties>
 
