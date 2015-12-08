@@ -35,6 +35,13 @@
   <name>Command Runner API</name>
   <description>Run a native/shell command in XWiki and get the result.</description>
 
+  <scm>
+    <connection>scm:git:git://github.com/xwiki-contrib/api-commandrunner.git</connection>
+    <developerConnection>scm:git:git@github.com:xwiki-contrib/api-commandrunner.git</developerConnection>
+    <url>https://github.com/xwiki-contrib/api-commandrunner</url>
+    <tag>HEAD</tag>
+  </scm>
+
   <properties>
    <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
@@ -44,6 +51,14 @@
     <xwiki.extension.features>calebjamesdelisle:commandrunner</xwiki.extension.features>
     <xwiki.version>5.2</xwiki.version>
   </properties>
+
+  <distributionManagement>
+    <repository>
+      <id>xwiki-staging</id>
+      <name>XWiki Staging Repository</name>
+      <url>http://nexus.xwiki.org/nexus/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
 
   <dependencies>
 
