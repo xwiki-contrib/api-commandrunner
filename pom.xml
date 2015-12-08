@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>5.2</version>
+    <version>6.2</version>
   </parent>
   <version>1.2-SNAPSHOT</version>
   <groupId>org.xwiki.contrib</groupId>
